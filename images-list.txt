@@ -1,4 +1,4 @@
-gcr.io/google_containers/kube-controller-manager-amd64:v1.6.3
+﻿gcr.io/google_containers/kube-controller-manager-amd64:v1.6.3
 gcr.io/google_containers/kube-apiserver-amd64:v1.6.3
 gcr.io/google_containers/kube-scheduler-amd64:v1.6.3
 gcr.io/google_containers/kube-proxy-amd64:v1.6.3
@@ -10,3 +10,35 @@ gcr.io/google_containers/k8s-dns-sidecar-amd64:1.14.1
 gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.1
 gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.1
 
+gcr.io/google_containers/kubernetes-dashboard-amd64:v1.6.0
+quay.io/coreos/flannel:v0.7.1-amd64
+
+
+https://github.com/freefengeli (20天前）
+
+
+images=(kube-controller-manager-amd64:v1.6.3 kube-apiserver-amd64:v1.6.3 kube-scheduler-amd64:v1.6.3 kube-proxy-amd64:v1.6.3 \
+etcd-amd64:3.0.17 pause-amd64:3.0 \
+k8s-dns-sidecar-amd64:1.14.1 k8s-dns-kube-dns-amd64:1.14.1 k8s-dns-dnsmasq-nanny-amd64:1.14.1)
+
+for imageName in ${images[@]} ; do
+  docker pull pmlpml/$imageName
+  docker tag pmlpml/$imageName gcr.io/google_containers/$imageName
+  docker rmi pmlpml/$imageName
+done
+
+
+kubeadm init --apiserver-advertise-address 192.168.56.130 --kubernetes-version v1.6.3 --pod-network-cidr=10.96.0.0/12
+
+kubeadm join --token fbf681.946c39b71be22879 192.168.56.130:6443
+
+
+
+kubectl --kubeconfig /etc/kubernetes/admin.conf get nodes
+
+However I just found such info in "kubeadm init" output:
+Your Kubernetes master has initialized successfully!
+To start using your cluster, you need to run (as a regular user):
+sudo cp /etc/kubernetes/admin.conf $HOME/
+sudo chown $(id -u):$(id -g) $HOME/admin.conf
+export KUBECONFIG=$HOME/admin.conf
